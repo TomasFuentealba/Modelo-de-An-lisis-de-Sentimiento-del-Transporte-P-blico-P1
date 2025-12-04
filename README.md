@@ -319,7 +319,7 @@ Al finalizar, se crean 5 archivos:
 
 ---
 
-#### 📊 **¿Qué pasa cuando ejecutas este módulo?**
+#### 📊 **¿Qué pasa cuando se ejecuta este módulo?**
 
 Al correr `python 07_model_training.py` se verá el progreso del entrenamiento:
 
@@ -363,43 +363,6 @@ El mayor logro es la detección de sentimientos neutros, que pasó del 2% al 72%
 
 ---
 
-## 🚀 Cómo Usar el Modelo
-
-Una vez entrenado el modelo, puedes usarlo para predecir el sentimiento de nuevas reseñas:
-
-```python
-import numpy as np
-import pickle
-from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing.sequence import pad_sequences
-
-# Cargar modelo y herramientas
-model = load_model('modelo_sentimiento_transporte.h5')
-with open('tokenizer.pkl', 'rb') as f:
-    tokenizer = pickle.load(f)
-with open('label_encoder.pkl', 'rb') as f:
-    label_encoder = pickle.load(f)
-
-# Nueva reseña
-nueva_resena = "El metro estaba muy limpio y llegó a tiempo, excelente servicio"
-
-# Convertir texto a números y predecir
-secuencia = tokenizer.texts_to_sequences([nueva_resena])
-padded = pad_sequences(secuencia, maxlen=100, padding='post')
-prediccion = model.predict(padded, verbose=0)
-
-# Obtener resultado
-clase_predicha = np.argmax(prediccion, axis=1)[0]
-sentimiento = label_encoder.classes_[clase_predicha]
-probabilidad = prediccion[0][clase_predicha]
-
-print(f"Reseña: {nueva_resena}")
-print(f"Sentimiento detectado: {sentimiento} ({probabilidad:.1%} confianza)")
-```
-
-Este código toma cualquier reseña nueva, la procesa igual que los datos de entrenamiento, y devuelve si es Positiva, Negativa o Neutra junto con el nivel de confianza.
-
----
 
 ## 🎯 Limitaciones y Mejoras Futuras
 
