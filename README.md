@@ -6,17 +6,13 @@ Este proyecto utiliza redes neuronales LSTM para clasificar automáticamente el 
 
 ## 📂 ¿Qué necesitas para empezar?
 
-Debes tener el archivo `transporte_santiago_clean.csv` con 1,002 reseñas ya limpias y etiquetadas. Este archivo contiene:
+Se trabaja con el archivo `transporte_santiago_clean.csv` con 1,002 reseñas ya limpias y etiquetadas. Este archivo contiene:
 - `review_text`: El texto de cada reseña
 - `satisfaccion`: La etiqueta del sentimiento (Positivo/Neutro/Negativo)
-
-> **Nota:** Si hiciste las evaluaciones anteriores (módulos 01-05), ya tienes este archivo. Si no, puedes partir directamente desde aquí.
 
 ---
 
 ## 🚀 ¿Cómo ejecutar el proyecto?
-
-Solo necesitas correr dos comandos:
 
 ```bash
 # 1. Prepara los datos para el modelo
@@ -26,7 +22,7 @@ python 06_nlp_preparation.py
 python 07_model_training.py
 ```
 
-Al terminar, tendrás un modelo entrenado (`modelo_sentimiento_transporte.h5`) que puede predecir si una reseña es positiva, neutra o negativa.
+Al terminar se obtiene un modelo entrenado (`modelo_sentimiento_transporte.h5`) que puede predecir si una reseña es positiva, neutra o negativa.
 
 ---
 
