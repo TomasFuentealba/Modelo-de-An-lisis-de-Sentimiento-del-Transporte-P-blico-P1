@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Embedding, LSTM, Dense, Dropout
 from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, confusion_matrix, ConfusionMatrixDisplay
 import pickle
@@ -35,7 +36,18 @@ print(f"  - X_train: {X_train.shape}")
 print(f"  - y_train: {y_train.shape}")
 print(f"  - X_test: {X_test.shape}")
 print(f"  - y_test: {y_test.shape}")
-print(f"  - Número de clases: {y_train.shape[1]}")
+
+# ============================================================================
+# CONVERTIR A ONE-HOT ENCODING
+# ============================================================================
+print("\n[INFO] Convirtiendo etiquetas a one-hot encoding...")
+num_classes = len(np.unique(y_train))
+y_train = to_categorical(y_train, num_classes=num_classes)
+y_test = to_categorical(y_test, num_classes=num_classes)
+
+print(f"  - Número de clases: {num_classes}")
+print(f"  - y_train (one-hot): {y_train.shape}")
+print(f"  - y_test (one-hot): {y_test.shape}")
 
 # ============================================================================
 # DIVISIÓN TRAIN/VALIDATION (SPLIT EXPLÍCITO)
@@ -56,7 +68,6 @@ print(f"  - Test: {X_test.shape[0]} muestras")
 # CONSTRUCCIÓN DEL MODELO DE DEEP LEARNING
 # ============================================================================
 print("\n[INFO] Construyendo arquitectura del modelo...")
-num_classes = y_train.shape[1]
 
 model = Sequential()
 
@@ -109,6 +120,9 @@ model.compile(
     loss='categorical_crossentropy',  # Para one-hot encoded labels
     metrics=['accuracy']
 )
+
+# Construir el modelo antes de mostrar arquitectura
+model.build(input_shape=(None, MAX_LENGTH))
 
 # Mostrar arquitectura del modelo
 print("\n" + "="*80)

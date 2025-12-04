@@ -1,0 +1,15 @@
+REPORTE DE CLASIFICACIÓN - DEEP LEARNING
+================================================================================
+
+Test Accuracy: 0.9801
+Test Loss: 0.0866
+
+              precision    recall  f1-score   support
+
+    Negativo       0.97      0.99      0.98        72
+      Neutro       1.00      0.94      0.97        48
+    Positivo       0.98      1.00      0.99        81
+
+    accuracy                           0.98       201
+   macro avg       0.98      0.97      0.98       201
+weighted avg       0.98      0.98      0.98       201

@@ -41,8 +41,8 @@ Al terminar se obtiene un modelo entrenado (`modelo_sentimiento_transporte.h5`) 
 ├── 🟡 ARTEFACTOS INTERMEDIOS (Generados por módulo 06)
 │   ├── X_train.npy                          # Secuencias de entrenamiento (801, 100)
 │   ├── X_test.npy                           # Secuencias de prueba (201, 100)
-│   ├── y_train.npy                          # Etiquetas train (801,)
-│   ├── y_test.npy                           # Etiquetas test (201,)
+│   ├── y_train.npy                          # Etiquetas train (801,) [0, 1, 2]
+│   ├── y_test.npy                           # Etiquetas test (201,) [0, 1, 2]
 │   ├── tokenizer.pkl                        # Tokenizador (vocabulario 10,000)
 │   └── label_encoder.pkl                    # Codificador de etiquetas
 │
@@ -162,8 +162,8 @@ Esta división mantiene la misma proporción de sentimientos en ambos grupos (38
 |---------|-------------|-------------|--------|
 | `X_train.npy` | (801, 100) | Secuencias de entrenamiento | ~320 KB |
 | `X_test.npy` | (201, 100) | Secuencias de prueba | ~80 KB |
-| `y_train.npy` | (801,) | Etiquetas de entrenamiento | ~7 KB |
-| `y_test.npy` | (201,) | Etiquetas de prueba | ~2 KB |
+| `y_train.npy` | (801,) | Etiquetas de entrenamiento (0, 1, 2) | ~7 KB |
+| `y_test.npy` | (201,) | Etiquetas de prueba (0, 1, 2) | ~2 KB |
 
 **Objetos guardados (Pickle):**
 
@@ -214,9 +214,26 @@ El modelo se configura con estos parámetros clave:
 
 ---
 
-#### 📥 **Paso 2: Carga y División de Datos**
+#### 📥 **Paso 2: Carga de Datos y Conversión a One-Hot**
 
-El modelo carga los archivos `.npy` del módulo 6 y los divide en tres grupos:
+El modelo carga los archivos `.npy` del módulo 6. Las etiquetas vienen en formato numérico simple (0, 1, 2), pero necesitan convertirse a **one-hot encoding** para el entrenamiento:
+
+```python
+# Antes (formato simple):
+y_train: [0, 2, 1, 0, ...]  # 801 valores
+
+# Después (one-hot):
+y_train: [[1, 0, 0],        # Negativo
+          [0, 0, 1],        # Positivo
+          [0, 1, 0],        # Neutro
+          [1, 0, 0], ...]   # (801, 3)
+```
+
+**¿Por qué one-hot?** Cada clase se representa como un vector donde solo una posición es 1 y las demás son 0. Esto permite que el modelo calcule probabilidades para cada sentimiento de forma independiente.
+
+#### ✂️ **Paso 3: División de Datos**
+
+Después de la conversión, los datos se dividen en tres grupos:
 
 | Grupo | Cantidad | Para qué sirve |
 |-------|----------|----------------|
@@ -228,7 +245,7 @@ Esta división permite entrenar el modelo, verificar que no esté memorizando, y
 
 ---
 
-#### 🏗️ **Paso 3: Arquitectura del Modelo**
+#### 🏗️ **Paso 4: Arquitectura del Modelo**
 
 El modelo tiene 6 capas que procesan las reseñas en secuencia:
 
@@ -259,7 +276,7 @@ El modelo tiene aproximadamente **825,000 parámetros** que se ajustan durante e
 
 ---
 
-#### 🏋️ **Paso 4: Entrenamiento**
+#### 🏋️ **Paso 5: Entrenamiento**
 
 El modelo comienza a aprender con estas configuraciones:
 - **Optimizador Adam:** Ajusta los pesos del modelo de forma inteligente
@@ -272,7 +289,7 @@ El entrenamiento típicamente toma entre 10-15 épocas antes de detenerse, logra
 
 ---
 
-#### 📊 **Paso 5: Evaluación y Resultados**
+#### 📊 **Paso 6: Evaluación y Resultados**
 
 Una vez entrenado, el modelo se evalúa con las 201 reseñas de prueba y genera:
 
@@ -305,7 +322,7 @@ Real  Neg   62     3     6    → 87% detecta negativos correctamente
 
 ---
 
-#### 💾 **Paso 6: Archivos Generados**
+#### 💾 **Paso 7: Archivos Generados**
 
 Al finalizar, se crean 5 archivos:
 
@@ -324,8 +341,9 @@ Al finalizar, se crean 5 archivos:
 Al correr `python 07_model_training.py` se verá el progreso del entrenamiento:
 
 1. **Carga de datos:** Lee los 6 archivos generados por el módulo 6
-2. **División en 3 grupos:** Train (640), Validation (161), Test (201)
-3. **Construcción del modelo:** Crea la red neuronal de 6 capas con ~825,000 parámetros
+2. **Conversión one-hot:** Transforma etiquetas (801,) → (801, 3) para 3 clases
+3. **División en 3 grupos:** Train (640), Validation (161), Test (201)
+4. **Construcción del modelo:** Crea la red neuronal de 6 capas con ~825,000 parámetros
 4. **Entrenamiento:** Comienza a aprender durante varias épocas (típicamente se detiene en la época 12 de 20 por EarlyStopping)
 5. **Evaluación final:** Prueba el modelo con las 201 reseñas que nunca vio durante el entrenamiento
 6. **Resultados:** Muestra que alcanza 83.58% de precisión
