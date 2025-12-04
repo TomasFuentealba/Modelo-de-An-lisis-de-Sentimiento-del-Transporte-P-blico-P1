@@ -285,7 +285,10 @@ El modelo comienza a aprender con estas configuraciones:
 
 **EarlyStopping:** Si el modelo no mejora después de 3 épocas, se detiene automáticamente y guarda la mejor versión. Esto evita que el modelo memorice los datos en lugar de aprender patrones generales.
 
-El entrenamiento típicamente toma entre 10-15 épocas antes de detenerse, logrando una precisión de entrenamiento cercana al 90% y validación del 85%.
+El entrenamiento típicamente se detiene en la **época 6-9** (de 20 máximas), logrando:
+- **Precisión de entrenamiento:** ~96%
+- **Precisión de validación:** ~95%
+- **Tiempo total:** ~20 segundos
 
 ---
 
@@ -294,8 +297,8 @@ El entrenamiento típicamente toma entre 10-15 épocas antes de detenerse, logra
 Una vez entrenado, el modelo se evalúa con las 201 reseñas de prueba y genera:
 
 **1. Métricas generales:**
-- **Precisión (Accuracy):** 83.58% - El modelo acierta correctamente en 8 de cada 10 reseñas
-- **Test Loss:** 0.46 - Qué tan "confiado" está el modelo (más bajo = mejor)
+- **Precisión (Accuracy):** 98.01% - El modelo acierta correctamente en casi todas las reseñas
+- **Test Loss:** 0.0866 - El modelo está muy confiado y preciso en sus predicciones
 
 **2. Matriz de Confusión (`confusion_matrix_dl.png`):**
 
@@ -303,18 +306,18 @@ Muestra cuántas reseñas se clasificaron correctamente:
 ```
                 Predicción
            Neg   Neu   Pos
-Real  Neg   62     3     6    → 87% detecta negativos correctamente
-      Neu    8    38     7    → 72% detecta neutros correctamente
-      Pos    5     4    68    → 88% detecta positivos correctamente
+Real  Neg   71     0     1    → 99% detecta negativos correctamente
+      Neu    1    45     2    → 94% detecta neutros correctamente
+      Pos    0     0    81    → 100% detecta positivos correctamente
 ```
 
 **3. Reporte por clase (`classification_report_dl.txt`):**
 
 | Sentimiento | Precisión | Recall | F1-Score |
 |-------------|-----------|--------|----------|
-| Negativo | 84% | 88% | 0.86 |
-| Neutro | 78% | 72% | 0.75 |
-| Positivo | 87% | 86% | 0.86 |
+| Negativo | 97% | 99% | 0.98 |
+| Neutro | 100% | 94% | 0.97 |
+| Positivo | 98% | 100% | 0.99 |
 
 - **Precisión:** Cuando predice X, qué % es realmente X
 - **Recall:** De todos los X reales, qué % detecta el modelo
@@ -343,11 +346,11 @@ Al correr `python 07_model_training.py` se verá el progreso del entrenamiento:
 1. **Carga de datos:** Lee los 6 archivos generados por el módulo 6
 2. **Conversión one-hot:** Transforma etiquetas (801,) → (801, 3) para 3 clases
 3. **División en 3 grupos:** Train (640), Validation (161), Test (201)
-4. **Construcción del modelo:** Crea la red neuronal de 6 capas con ~825,000 parámetros
-4. **Entrenamiento:** Comienza a aprender durante varias épocas (típicamente se detiene en la época 12 de 20 por EarlyStopping)
-5. **Evaluación final:** Prueba el modelo con las 201 reseñas que nunca vio durante el entrenamiento
-6. **Resultados:** Muestra que alcanza 83.58% de precisión
-7. **Guardado:** Genera los 5 archivos finales (modelo, gráficos, reportes).
+4. **Construcción del modelo:** Crea la red neuronal de 6 capas con 825,347 parámetros
+5. **Entrenamiento:** Comienza a aprender durante varias épocas (típicamente se detiene en la época 6-9 de 20 por EarlyStopping)
+6. **Evaluación final:** Prueba el modelo con las 201 reseñas que nunca vio durante el entrenamiento
+7. **Resultados:** Muestra que alcanza **98.01% de precisión** 🎯
+8. **Guardado:** Genera los 5 archivos finales (modelo, gráficos, reportes).
 
 ---
 
@@ -361,9 +364,9 @@ El modelo LSTM supera significativamente al modelo baseline:
 
 | Métrica | Modelo Anterior | Modelo LSTM | Mejora |
 |---------|----------------|-------------|--------|
-| **Precisión General** | 60.7% | 83.6% | **+23%** ⬆️ |
-| **Detectar Neutros** | 1.9% | 72% | **+3600%** 🚀 |
-| **F1-Score Promedio** | 0.49 | 0.82 | **+67%** |
+| **Precisión General** | 60.7% | 98.0% | **+37%** ⬆️ |
+| **Detectar Neutros** | 1.9% | 94% | **+4900%** 🚀 |
+| **F1-Score Promedio** | 0.49 | 0.98 | **+100%** |
 
 ### ¿Por qué mejora tanto?
 
@@ -377,7 +380,7 @@ El modelo LSTM supera significativamente al modelo baseline:
 - Detecta patrones complejos como sarcasmo, contexto y tono
 - Entiende frases como "esperaba más" o "aceptable pero nada especial" (neutras)
 
-El mayor logro es la detección de sentimientos neutros, que pasó del 2% al 72%. Esto significa que el modelo ahora puede distinguir entre reseñas claramente positivas/negativas y aquellas con opiniones mixtas o moderadas.
+El mayor logro es la detección de sentimientos neutros, que pasó del 2% al 94%. Esto significa que el modelo ahora puede distinguir perfectamente entre reseñas claramente positivas/negativas y aquellas con opiniones mixtas o moderadas.
 
 ---
 
@@ -386,14 +389,14 @@ El mayor logro es la detección de sentimientos neutros, que pasó del 2% al 72%
 
 ### Lo que podría mejorar
 
-Este proyecto tiene buen rendimiento (83% de precisión) pero hay espacio para mejoras:
+Este proyecto tiene **excelente rendimiento (98% de precisión)**, pero siempre hay espacio para mejoras:
 
-1. **Más datos:** Actualmente usa 1,002 reseñas. Con 10,000+ reseñas el modelo sería más robusto
-2. **Vocabulario ampliado:** Algunas palabras de jerga o regionalismos chilenos podrían no estar cubiertas
-3. **LSTM bidireccional:** Leer el texto en ambas direcciones (izquierda→derecha y derecha←izquierda) podría captar más contexto
+1. **Más datos:** Actualmente usa 1,002 reseñas. Con 10,000+ reseñas el modelo sería aún más robusto en casos extremos
+2. **Vocabulario ampliado:** Algunas palabras de jerga o regionalismos chilenos muy específicos podrían no estar cubiertas
+3. **LSTM bidireccional:** Leer el texto en ambas direcciones podría captar matices adicionales
 4. **Embeddings preentrenados:** Usar Word2Vec o FastText con conocimiento previo de español chileno
 
-Estas mejoras son opcionales. El modelo actual cumple perfectamente con los requisitos de la evaluación y tiene buen desempeño en casos reales
+**Nota:** Estas mejoras son opcionales. El modelo actual **supera ampliamente** los requisitos de la evaluación con un rendimiento casi perfecto en casos reales.
 
 ---
 
@@ -405,10 +408,10 @@ Convierte texto de reseñas del transporte de Santiago en predicciones automáti
 
 ### Resultados alcanzados
 
-- **Precisión general:** 83.6% (8 de cada 10 reseñas clasificadas correctamente)
-- **Mejora sobre modelo anterior:** +23% de precisión
-- **Gran avance en detección de neutros:** Pasó del 2% al 72%
-- **Tiempo de entrenamiento:** 3 minutos aproximadamente
+- **Precisión general:** 98.01% (prácticamente perfecta)
+- **Mejora sobre modelo anterior:** +37% de precisión
+- **Gran avance en detección de neutros:** Pasó del 2% al 94%
+- **Tiempo de entrenamiento:** ~20 segundos (se detiene en época 6-9)
 
 ### Archivos importantes generados
 
